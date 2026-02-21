@@ -1,10 +1,11 @@
 import {Request, Response} from 'express'
 import prisma from '../lib/prisma.js';
-import openai from '../configs/openai.js';
+import openai, { AI_MODEL } from '../configs/openai.js';
 
 // Controller Function to Make Revision
 export const makeRevision = async (req: Request, res: Response) => {
     const userId = req.userId;
+    let chargedCredits = false;
 
     try {
         
@@ -48,10 +49,11 @@ export const makeRevision = async (req: Request, res: Response) => {
             where: {id: userId},
             data: {credits: {decrement: 5}}
         })
+        chargedCredits = true;
 
         // Enhance user prompt
         const promptEnhanceResponse = await openai.chat.completions.create({
-            model: 'kwaipilot/kat-coder-pro:free',
+            model: AI_MODEL,
             messages: [
                 {
                     role: 'system',
@@ -92,7 +94,7 @@ export const makeRevision = async (req: Request, res: Response) => {
 
         // Generate website code
         const codeGenerationResponse = await openai.chat.completions.create({
-            model: 'kwaipilot/kat-coder-pro:free',
+            model: AI_MODEL,
             messages: [
                 {
                     role: 'system',
@@ -131,6 +133,7 @@ export const makeRevision = async (req: Request, res: Response) => {
             where: {id: userId},
             data: {credits: {increment: 5}}
         })
+        chargedCredits = false;
         return;
         }
 
@@ -165,12 +168,18 @@ export const makeRevision = async (req: Request, res: Response) => {
 
         res.json({message: 'Changes made successfully'})
     } catch (error : any) {
-        await prisma.user.update({
-            where: {id: userId},
-            data: {credits: {increment: 5}}
-        })
-        console.log(error.code || error.message);
-        res.status(500).json({ message: error.message });
+        if (chargedCredits && userId) {
+            try {
+                await prisma.user.update({
+                    where: {id: userId},
+                    data: {credits: {increment: 5}}
+                })
+            } catch (refundErr) {
+                console.error('Refund failed', { err: refundErr, userId, chargedCredits });
+            }
+        }
+        console.error('Project revision failed', { err: error, userId, chargedCredits });
+        res.status(500).json({ message: 'Internal server error' });
     }
 }
 

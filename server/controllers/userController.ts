@@ -1,6 +1,6 @@
 import {Request, Response} from 'express'
 import prisma from '../lib/prisma.js';
-import openai from '../configs/openai.js';
+import openai, { AI_MODEL, AI_MAX_TOKENS } from '../configs/openai.js';
 import Stripe from 'stripe'
 
 // Get User Credits
@@ -25,6 +25,7 @@ export const getUserCredits = async (req: Request, res: Response) => {
 // Controller Function to create New Project
 export const createUserProject = async (req: Request, res: Response) => {
     const userId = req.userId;
+    let chargedCredits = false;
     try {
         const { initial_prompt } = req.body;
 
@@ -67,12 +68,14 @@ export const createUserProject = async (req: Request, res: Response) => {
             where: {id: userId},
             data: {credits: {decrement: 5}}
         })
+        chargedCredits = true;
 
         res.json({projectId: project.id})
 
         // Enhance user prompt
         const promptEnhanceResponse = await openai.chat.completions.create({
-            model: 'kwaipilot/kat-coder-pro:free',
+            model: AI_MODEL,
+            max_tokens: AI_MAX_TOKENS,
             messages: [
                 {
                     role: 'system',
@@ -116,7 +119,8 @@ export const createUserProject = async (req: Request, res: Response) => {
 
         // Generate website code
         const codeGenerationResponse = await openai.chat.completions.create({
-            model: 'kwaipilot/kat-coder-pro:free',
+            model: AI_MODEL,
+            max_tokens: AI_MAX_TOKENS,
             messages: [
                 {
                     role: 'system',
@@ -167,6 +171,7 @@ export const createUserProject = async (req: Request, res: Response) => {
             where: {id: userId},
             data: {credits: {increment: 5}}
         })
+        chargedCredits = false;
         return;
         }
 
@@ -200,12 +205,20 @@ export const createUserProject = async (req: Request, res: Response) => {
         })
 
     } catch (error : any) {
-        await prisma.user.update({
-            where: {id: userId},
-            data: {credits: {increment: 5}}
-        })
+        if (chargedCredits && userId) {
+            try {
+                await prisma.user.update({
+                    where: {id: userId},
+                    data: {credits: {increment: 5}}
+                })
+            } catch (refundErr) {
+                console.error('Refund failed', { err: refundErr, userId, chargedCredits });
+            }
+        }
         console.log(error);
-        res.status(500).json({ message: error.message });
+        if (!res.headersSent) {
+            res.status(500).json({ message: error.message });
+        }
     }
 }
 
