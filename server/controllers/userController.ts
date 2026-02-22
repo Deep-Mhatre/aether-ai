@@ -29,6 +29,10 @@ export const createUserProject = async (req: Request, res: Response) => {
     try {
         const { initial_prompt } = req.body;
 
+        if (!initial_prompt || typeof initial_prompt !== 'string' || initial_prompt.trim() === '') {
+            return res.status(400).json({ message: 'Please provide a valid project description' });
+        }
+
         if(!userId){
             return res.status(401).json({ message: 'Unauthorized' });
         }
@@ -69,8 +73,6 @@ export const createUserProject = async (req: Request, res: Response) => {
             data: {credits: {decrement: 5}}
         })
         chargedCredits = true;
-
-        res.json({projectId: project.id})
 
         // Enhance user prompt
         const promptEnhanceResponse = await openai.chat.completions.create({
@@ -203,6 +205,8 @@ export const createUserProject = async (req: Request, res: Response) => {
                 current_version_index: version.id
             }
         })
+
+        res.json({projectId: project.id})
 
     } catch (error : any) {
         if (chargedCredits && userId) {

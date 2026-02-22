@@ -40,8 +40,9 @@ const Pricing = () => {
         <div className='pt-14 py-4 px-4 '>
         <div className='grid grid-cols-1 md:grid-cols-3 flex-wrap gap-4'>
                         {plans.map((plan, idx) => (
-                            <div key={idx} className="p-6 bg-black/20 ring ring-indigo-950 mx-auto w-full max-w-sm rounded-lg text-white shadow-lg hover:ring-indigo-500 transition-all duration-400">
-                                <h3 className="text-xl font-bold">{plan.name}</h3>
+                            <div key={idx} className={`relative p-7 mx-auto w-full max-w-sm rounded-xl text-white bg-white/5 backdrop-blur border border-white/10 shadow-[0_0_40px_rgba(140,80,255,0.15)] hover:shadow-[0_0_70px_rgba(160,100,255,0.45)] hover:scale-[1.03] transition-all duration-300 
+                            ${idx === 1 && 'border-indigo-500 scale-105 shadow-[0_0_80px_rgba(160,100,255,0.6)]'}
+`}>                                <h3 className="text-xl font-bold">{plan.name}</h3>
                                 <div className="my-2">
                                     <span className="text-4xl font-bold">{plan.price}</span>
                                     <span className="text-gray-300"> / {plan.credits} credits</span>

@@ -35,35 +35,58 @@ const Home = () => {
 
   return (
   
-      <section className="flex flex-col items-center text-white text-sm pb-20 px-4 font-poppins">
+      <section className="relative flex flex-col items-center text-white text-sm pb-28 px-4 font-poppins bg-[#0C0414] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-transparent to-black/40 pointer-events-none" />
 
-        <a href="https://prebuiltui.com" className="flex items-center gap-2 border border-slate-700 rounded-full p-1 pr-3 text-sm mt-20">
-          <span className="bg-indigo-600 text-xs px-3 py-1 rounded-full">NEW</span>
-          <p className="flex items-center gap-2">
-            <span>Try 30 days free trial option</span>
-            <svg className="mt-px" width="6" height="9" viewBox="0 0 6 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m1 1 4 3.5L1 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </p>
-        </a>
+        <div className="p-px rounded-full bg-gradient-to-r from-indigo-900 to-gray-500 mt-24">
+  <div className="flex items-center justify-center px-4 py-2 rounded-full bg-[#0C0414] text-sm text-slate-200">
+    ⚡ AI-Powered Website Generator
+  </div>
+</div>
 
-        <h1 className="text-center text-[40px] leading-[48px] md:text-6xl md:leading-[70px] mt-4 font-semibold max-w-3xl">
-          Turn thoughts into websites instantly, with AI.
-        </h1>
+       <h1 className="text-4xl md:text-[66px]/[72px] text-center max-w-4xl mt-6 
+bg-gradient-to-r from-[#5b3b82] via-white to-[#5b3b82] 
+text-transparent bg-clip-text font-semibold leading-tight">
+  Design, Build & Launch Websites with AI in Minutes
+</h1>
 
-        <p className="text-center text-base max-w-md mt-2">
-          Create, customize and publish website faster than ever with our AI Site Builder.
-        </p>
+       <p className="text-sm md:text-base bg-gradient-to-r from-[#5b3b82] via-white to-[#5b3b82] 
+text-transparent bg-clip-text text-center max-w-lg mt-4">
+  Create production-ready websites and UI components instantly with AI-generated layouts, code and design systems.
+</p>
+
+<div className="absolute top-[220px] left-1/2 -translate-x-1/2 
+w-[800px] h-40 bg-purple-700 blur-[120px] opacity-30 pointer-events-none -z-10"></div>
 
         <form onSubmit={onSubmitHandler} className="bg-white/10 max-w-2xl w-full rounded-xl p-4 mt-10 border border-indigo-600/70 focus-within:ring-2 ring-indigo-500 transition-all">
-          <textarea onChange={e => setInput(e.target.value)} className="bg-transparent outline-none text-gray-300 resize-none w-full" rows={4} placeholder="Describe your presentation in details" required />
-          <button className="ml-auto flex items-center gap-2 bg-gradient-to-r from-[#CB52D4] to-indigo-600 rounded-md px-4 py-2">
+          <textarea onChange={e => setInput(e.target.value)} className="bg-transparent outline-none text-gray-300 resize-none w-full" rows={4} placeholder="“Describe your website idea (e.g. AI fitness app with pricing & blog)”" required />
+          <button 
+            disabled={loading}
+            className={`ml-auto flex items-center gap-2 
+            bg-gradient-to-r from-[#CB52D4] to-indigo-600 
+            rounded-md px-5 py-2.5 transition 
+            ${loading && 'opacity-70 cursor-not-allowed'}`}
+          >
             {!loading ? 'Create with AI' : (
               <>
               Creating <Loader2Icon className='animate-spin size-4 text-white'/>
               </>
             )}
-            
           </button>
         </form>
+
+        <div className="relative mt-16 w-full max-w-5xl px-4">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 
+          w-[700px] h-32 bg-purple-500 blur-[80px] opacity-60"></div>
+
+          <div className="relative z-10 bg-white/5 backdrop-blur rounded-2xl p-3 border border-white/10 shadow-2xl">
+            <img
+              className="rounded-lg"
+              src="https://assets.prebuiltui.com/images/components/hero-section/hero-dashImage1.png"
+              alt="AI Builder Preview"
+            />
+          </div>
+        </div>
 
         <div className="flex flex-wrap items-center justify-center gap-16 md:gap-20 mx-auto mt-16">
           <img className="max-w-28 md:max-w-32" src="https://saasly.prebuiltui.com/assets/companies-logo/framer.svg" alt="" />
