@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { assets } from '../assets/assets';
 import { Link, useNavigate } from 'react-router-dom';
-import { authClient } from '@/lib/auth-client';
-import {UserButton} from '@daveyplate/better-auth-ui'
+import { UserButton, useUser } from '@clerk/clerk-react'
 import api from '@/configs/axios';
 import { toast } from 'sonner';
 
@@ -11,7 +10,7 @@ const Navbar = () => {
     const navigate = useNavigate()
     const [credits, setCredits] = useState(0)
 
-    const {data: session} = authClient.useSession()
+    const { user, isLoaded } = useUser()
 
     const getCredits = async () => {
       try {
@@ -24,10 +23,10 @@ const Navbar = () => {
     }
 
     useEffect(()=>{
-      if(session?.user){
+      if(user){
         getCredits()
       }
-    },[session?.user])
+    },[user])
 
   return (
     <>
@@ -45,8 +44,8 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-3">
-          {!session?.user ? (
-            <button onClick={()=> navigate('/auth/signin')} className="px-6 py-2 rounded-lg font-medium text-white
+          {!user && isLoaded ? (
+            <button onClick={()=> navigate('/clerk/sign-in')} className="cta-glow-hover px-6 py-2 rounded-lg font-medium text-white
             bg-gradient-to-r from-[#7C5CFF] to-[#A855F7] shadow-[0_0_25px_rgba(140,80,255,0.6)] hover:shadow-[0_0_40px_rgba(160,100,255,0.9)] hover:scale-[1.03] active:scale-95 transition-all duration-300">
               Get started
             </button>
@@ -55,7 +54,7 @@ const Navbar = () => {
             <button className='bg-white/10 px-5 py-1.5 text-xs sm:text-sm border text-gray-200 rounded-full'>
             Credits : <span className='text-indigo-300'>{credits}</span>
             </button>
-            <UserButton size='icon'/>
+            <UserButton />
             </>
             
           ) 

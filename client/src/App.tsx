@@ -12,6 +12,7 @@ import { Toaster } from 'sonner'
 import AuthPage from './pages/auth/AuthPage'
 import Settings from './pages/Settings'
 import Loading from './pages/Loading'
+import { ClerkSignInPage, ClerkSignUpPage } from './pages/auth/ClerkAuthPage'
 
 const App = () => {
 
@@ -36,6 +37,8 @@ const App = () => {
         <Route path='/community' element={<Community />} />
         <Route path='/view/:projectId' element={<View />} />
         <Route path="/auth/:pathname" element={<AuthPage />} />
+        <Route path="/clerk/sign-in/*" element={<ClerkSignInPage />} />
+        <Route path="/clerk/sign-up/*" element={<ClerkSignUpPage />} />
         <Route path="/account/settings" element={<Settings />} />
         <Route path='/loading' element={<Loading />}/>
       </Routes>

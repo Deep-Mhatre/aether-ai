@@ -5,12 +5,12 @@ import ProjectPreview from "../components/ProjectPreview";
 import type { Project, Version } from "../types";
 import api from "@/configs/axios";
 import { toast } from "sonner";
-import { authClient } from "@/lib/auth-client";
+import { useUser } from "@clerk/clerk-react";
 
 
 const Preview = () => {
 
-  const {data: session, isPending} = authClient.useSession()
+  const { user, isLoaded } = useUser()
   const { projectId, versionId } = useParams()
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(true);
@@ -34,10 +34,15 @@ const Preview = () => {
   }
 
   useEffect(()=>{
-    if(!isPending && session?.user){
+    if (isLoaded && user) {
       fetchCode()
+      return
     }
-  },[session?.user])
+    if (isLoaded && !user) {
+      setLoading(false)
+      toast.error('Please sign in to view this project')
+    }
+  },[user, isLoaded, projectId, versionId])
 
   if(loading){
     return (

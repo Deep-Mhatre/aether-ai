@@ -6,10 +6,10 @@ import { dummyProjects } from '../assets/assets';
 import Footer from '../components/Footer';
 import api from '@/configs/axios';
 import { toast } from 'sonner';
-import { authClient } from '@/lib/auth-client';
+import { useUser } from '@clerk/clerk-react';
 
 const MyProjects = () => {
-    const {data: session, isPending} = authClient.useSession()
+    const { user, isLoaded } = useUser()
     const [loading, setLoading] = useState(true);
     const [projects, setProjects] = useState<Project[]>([])
     const navigate = useNavigate()
@@ -39,13 +39,13 @@ const MyProjects = () => {
     }
 
     useEffect(()=>{
-        if(session?.user && !isPending){
+        if(user && isLoaded){
             fetchProjects()
-        }else if(!isPending && !session?.user){
+        }else if(isLoaded && !user){
             navigate('/');
             toast('Please login to view your projects');
         }
-    },[session?.user])
+    },[user, isLoaded])
   return (
     <>
       <div className='px-4 md:px-16 lg:px-24 xl:px-32'>
