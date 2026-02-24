@@ -19,6 +19,7 @@ model User {
   name          String
   totalCreation Int    @default(0)
   credits       Int    @default(20)
+  creditsLastRefreshedAt DateTime @default(now())
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   emailVerified Boolean   @default(false)

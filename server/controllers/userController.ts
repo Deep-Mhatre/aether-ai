@@ -2,6 +2,7 @@ import {Request, Response} from 'express'
 import prisma from '../lib/prisma.js';
 import openai, { AI_MODEL, AI_MAX_TOKENS } from '../configs/openai.js';
 import Stripe from 'stripe'
+import { refreshDailyCreditsIfNeeded } from '../lib/credits.js';
 
 // Get User Credits
 export const getUserCredits = async (req: Request, res: Response) => {
@@ -9,6 +10,12 @@ export const getUserCredits = async (req: Request, res: Response) => {
         const userId = req.userId;
         if(!userId){
             return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        try {
+            await refreshDailyCreditsIfNeeded(userId);
+        } catch (refreshError) {
+            console.error('refreshDailyCreditsIfNeeded failed for userId', { err: refreshError, userId });
         }
 
         const user = await prisma.user.findUnique({
@@ -35,6 +42,12 @@ export const createUserProject = async (req: Request, res: Response) => {
 
         if(!userId){
             return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        try {
+            await refreshDailyCreditsIfNeeded(userId);
+        } catch (refreshError) {
+            console.error('refreshDailyCreditsIfNeeded failed for userId', { err: refreshError, userId });
         }
 
         const user = await prisma.user.findUnique({

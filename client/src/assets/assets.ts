@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+import logo from './logo-aether.png';
 
 export const assets = {
     logo,

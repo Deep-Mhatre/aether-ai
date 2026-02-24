@@ -1,6 +1,7 @@
 import {Request, Response} from 'express'
 import prisma from '../lib/prisma.js';
 import openai, { AI_MODEL } from '../configs/openai.js';
+import { refreshDailyCreditsIfNeeded } from '../lib/credits.js';
 
 // Controller Function to Make Revision
 export const makeRevision = async (req: Request, res: Response) => {
@@ -12,12 +13,22 @@ export const makeRevision = async (req: Request, res: Response) => {
         const {projectId} = req.params;
         const {message} = req.body;
 
+        if(!userId){
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
         const user = await prisma.user.findUnique({
             where: {id: userId}
         })
 
         if(!userId || !user){
             return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        try {
+            await refreshDailyCreditsIfNeeded(userId);
+        } catch (refreshError) {
+            console.error('Daily credits refresh failed', { err: refreshError, userId });
         }
 
         if(user.credits < 5){
