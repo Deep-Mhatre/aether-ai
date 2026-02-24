@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import type { Project } from '../types'
 import { ArrowBigDownDashIcon, EyeIcon, EyeOffIcon, FullscreenIcon, LaptopIcon, Loader2Icon, MessageSquareIcon, SaveIcon, SmartphoneIcon, TabletIcon, XIcon } from 'lucide-react'
@@ -23,6 +23,8 @@ const Projects = () => {
   const [isSaving, setIsSaving] = useState(false)
 
   const previewRef = useRef<ProjectPreviewRef>(null)
+  const deviceButtonClass = (selected: boolean) =>
+    `size-8 p-1.5 rounded-lg transition-colors ${selected ? 'bg-white/[18%] text-white' : 'text-white/70 hover:text-white hover:bg-white/[8%]'}`
 
   const fetchProject = async () => {
     try {
@@ -106,55 +108,60 @@ const Projects = () => {
     )
   }
   return project ? (
-    <div className='flex flex-col h-screen w-full bg-gray-900 text-white'>
-      {/* builder navbar  */}
-      <div className='flex max-sm:flex-col sm:items-center gap-4 px-4 py-2 no-scrollbar'>
-        {/* left  */}
-        <div className='flex items-center gap-2 sm:min-w-90 text-nowrap'>
-          <img src="/favicon.svg" alt="logo" className="h-6 cursor-pointer" onClick={()=> navigate('/')}/>
-          <div className='max-w-64 sm:max-w-xs'>
-            <p className='text-sm text-medium capitalize truncate'>{project.name}</p>
-            <p className='text-xs text-gray-400 -mt-0.5'>Previewing last saved version</p>
-          </div>
-          <div className='sm:hidden flex-1 flex justify-end'>
-            {isMenuOpen ? 
-            <MessageSquareIcon onClick={()=> setIsMenuOpen(false)} className="size-6 cursor-pointer" />
-            : <XIcon onClick={()=> setIsMenuOpen(true)} className="size-6 cursor-pointer"/>}
-          </div>
-        </div>
-        {/* middle  */}
-        <div className='hidden sm:flex gap-2 bg-gray-950 p-1.5 rounded-md'>
-          <SmartphoneIcon onClick={()=> setDevice('phone')} className={`size-6 p-1 rounded cursor-pointer ${device === 'phone' ? "bg-gray-700" : ""}`}/>
+    <div className='studio-shell h-screen w-full overflow-hidden text-white p-2 sm:p-3'>
+      <div className='studio-panel h-full flex flex-col overflow-hidden'>
+        <div className='px-3 py-2 sm:px-4 sm:py-3 border-b border-white/10 bg-[#050f28]/75 backdrop-blur-xl'>
+          <div className='flex flex-col gap-3 lg:flex-row lg:items-center'>
+            <div className='flex items-center gap-3 min-w-0 lg:w-[360px]'>
+              <img src="/favicon.svg" alt="logo" className="h-6 w-6 cursor-pointer shrink-0" onClick={()=> navigate('/')}/>
+              <div className='min-w-0'>
+                <p className='text-sm font-medium capitalize truncate'>{project.name}</p>
+                <p className='text-xs studio-muted'>Previewing last saved version</p>
+              </div>
+              <button
+                onClick={() => setIsMenuOpen((prev) => !prev)}
+                className='sm:hidden ml-auto rounded-lg border border-white/15 bg-white/8 p-1.5'
+              >
+                {isMenuOpen ? <XIcon className="size-5" /> : <MessageSquareIcon className="size-5"/>}
+              </button>
+            </div>
 
-          <TabletIcon onClick={()=> setDevice('tablet')} className={`size-6 p-1 rounded cursor-pointer ${device === 'tablet' ? "bg-gray-700" : ""}`}/>
+            <div className='hidden sm:flex items-center gap-1 studio-soft-panel px-1.5 py-1'>
+              <button type="button" onClick={()=> setDevice('phone')} className={deviceButtonClass(device === 'phone')} aria-label="Switch to phone view" aria-pressed={device === 'phone'}>
+                <SmartphoneIcon className="size-5"/>
+              </button>
+              <button type="button" onClick={()=> setDevice('tablet')} className={deviceButtonClass(device === 'tablet')} aria-label="Switch to tablet view" aria-pressed={device === 'tablet'}>
+                <TabletIcon className="size-5"/>
+              </button>
+              <button type="button" onClick={()=> setDevice('desktop')} className={deviceButtonClass(device === 'desktop')} aria-label="Switch to desktop view" aria-pressed={device === 'desktop'}>
+                <LaptopIcon className="size-5"/>
+              </button>
+            </div>
 
-          <LaptopIcon onClick={()=> setDevice('desktop')} className={`size-6 p-1 rounded cursor-pointer ${device === 'desktop' ? "bg-gray-700" : ""}`}/>
-        </div>
-        {/* right  */}
-        <div className='flex items-center justify-end gap-3 flex-1 text-xs sm:text-sm'>
-              <button onClick={saveProject} disabled={isSaving} className='max-sm:hidden bg-gray-800 hover:bg-gray-700 text-white px-3.5 py-1 flex items-center gap-2 rounded sm:rounded-sm transition-colors border border-gray-700'>
+            <div className='flex items-center gap-2 lg:ml-auto text-xs sm:text-sm overflow-x-auto no-scrollbar'>
+              <button onClick={saveProject} disabled={isSaving} className='studio-btn-ghost px-3.5 py-2 rounded-lg flex items-center gap-2 whitespace-nowrap disabled:opacity-70'>
                 {isSaving ? <Loader2Icon className="animate-spin" size={16}/> : <SaveIcon size={16}/>} Save
               </button>
-              <Link target='_blank' to={`/preview/${projectId}`} className="flex items-center gap-2 px-4 py-1 rounded sm:rounded-sm border border-gray-700 hover:border-gray-500 transition-colors">
+              <Link target='_blank' to={`/preview/${projectId}`} className="studio-btn-ghost px-3.5 py-2 rounded-lg flex items-center gap-2 whitespace-nowrap">
                 <FullscreenIcon size={16} /> Preview
               </Link>
-              <button onClick={downloadCode} className='bg-linear-to-br from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 text-white px-3.5 py-1 flex items-center gap-2 rounded sm:rounded-sm transition-colors'>
+              <button onClick={downloadCode} className='studio-btn-primary px-3.5 py-2 rounded-lg flex items-center gap-2 whitespace-nowrap'>
                 <ArrowBigDownDashIcon size={16} /> Download
               </button>
-              <button onClick={togglePublish} className='bg-linear-to-br from-indigo-700 to-indigo-600 hover:from-indigo-600 hover:to-indigo-500 text-white px-3.5 py-1 flex items-center gap-2 rounded sm:rounded-sm transition-colors'>
-                {project.isPublished ?
-                <EyeOffIcon size={16}/> : <EyeIcon size={16}/> 
-              }
+              <button onClick={togglePublish} className='bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 px-3.5 py-2 rounded-lg flex items-center gap-2 whitespace-nowrap shadow-[0_8px_24px_rgba(0,185,220,0.28)] transition-all'>
+                {project.isPublished ? <EyeOffIcon size={16}/> : <EyeIcon size={16}/>}
                 {project.isPublished ? "Unpublish" : "Publish"}
               </button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className='flex-1 flex overflow-auto'>
-             <Sidebar isMenuOpen={isMenuOpen} project={project} setProject={(p)=>setProject(p)} isGenerating={isGenerating} setIsGenerating={setIsGenerating}/>
 
-              <div className='flex-1 p-2 pl-0'>
-                <ProjectPreview ref={previewRef} project={project} isGenerating={isGenerating} device={device}/>
-              </div>
+        <div className='flex-1 flex overflow-hidden p-2 sm:p-3 gap-3'>
+          <Sidebar isMenuOpen={isMenuOpen} project={project} setProject={(p)=>setProject(p)} isGenerating={isGenerating} setIsGenerating={setIsGenerating}/>
+          <div className='flex-1 min-w-0'>
+            <ProjectPreview ref={previewRef} project={project} isGenerating={isGenerating} device={device}/>
+          </div>
+        </div>
       </div>
     </div>
   )

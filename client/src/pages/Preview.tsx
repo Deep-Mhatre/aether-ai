@@ -47,13 +47,24 @@ const Preview = () => {
   if(loading){
     return (
       <div className='flex items-center justify-center h-screen'>
-        <Loader2Icon className='size-7 animate-spin text-indigo-200' />
+        <Loader2Icon className='size-7 animate-spin text-cyan-200' />
       </div>
     )
   }
+
+  if (!code) {
+    return (
+      <div className='flex flex-col items-center justify-center h-screen'>
+        <h1 className='text-2xl font-semibold text-[#d7ffd5]'>
+          {!user ? 'Please sign in to view this project' : 'Project not found or no content available'}
+        </h1>
+      </div>
+    )
+  }
+
   return (
-    <div className="h-screen">
-      {code && <ProjectPreview project={{current_code: code} as Project} isGenerating={false} showEditorPanel={false}/>}
+    <div className="h-screen p-3">
+      <ProjectPreview project={{current_code: code} as Project} isGenerating={false} showEditorPanel={false}/>
     </div>
   )
 }

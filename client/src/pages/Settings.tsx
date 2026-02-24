@@ -7,19 +7,19 @@ const Settings = () => {
       <AccountSettingsCards 
       classNames={{
         card: {
-            base: 'bg-black/10 ring ring-indigo-950 max-w-xl mx-auto',
-            footer: 'bg-black/10 ring ring-indigo-950'
+            base: 'bg-[#071a46]/70 border border-blue-200/20 max-w-xl mx-auto text-blue-50',
+            footer: 'bg-[#061438]/70 border-t border-blue-200/15'
         }
       }}/>
       <div className="w-full">
             <ChangePasswordCard classNames={{
-                base: 'bg-black/10 ring ring-indigo-950 max-w-xl mx-auto',
-                footer: 'bg-black/10 ring ring-indigo-950'
+                base: 'bg-[#071a46]/70 border border-blue-200/20 max-w-xl mx-auto text-blue-50',
+                footer: 'bg-[#061438]/70 border-t border-blue-200/15'
             }}/>
         </div>
         <div className="w-full">
             <DeleteAccountCard classNames={{
-                base: 'bg-black/10 ring ring-indigo-950 max-w-xl mx-auto'
+                base: 'bg-[#071a46]/70 border border-blue-200/20 max-w-xl mx-auto text-blue-50'
             }}/>
         </div>
       </div>     

@@ -1,105 +1,152 @@
-import api from '@/configs/axios';
-import { useUser } from '@clerk/clerk-react';
-import { Loader2Icon } from 'lucide-react';
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import api from '@/configs/axios'
+import { useUser } from '@clerk/clerk-react'
+import { BotIcon, CalendarIcon, DatabaseIcon, Loader2Icon, SparklesIcon } from 'lucide-react'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+
+const featureCards = [
+  {
+    title: 'Instant Website Generation',
+    subtitle: 'Turn one prompt into a complete responsive site',
+    icon: CalendarIcon,
+  },
+  {
+    title: 'Smart AI Revisions',
+    subtitle: 'Refine sections, copy, and layout in seconds',
+    icon: SparklesIcon,
+  },
+  {
+    title: 'Version History and Rollback',
+    subtitle: 'Track changes and restore any previous version',
+    icon: DatabaseIcon,
+  },
+  {
+    title: 'Publish and Share',
+    subtitle: 'Push live and share public project previews instantly',
+    icon: BotIcon,
+  },
+]
 
 const Home = () => {
-
   const { user, isLoaded } = useUser()
   const navigate = useNavigate()
 
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
 
   const onSubmitHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
       if (!isLoaded) {
         return toast.error('Loading your session, please try again in a moment')
       }
-      if(!user){
+      if (!user) {
         return toast.error('Please sign in to create a project')
-      }else if(!input.trim()){
+      }
+      if (!input.trim()) {
         return toast.error('Please enter a message')
       }
       setLoading(true)
-      const {data} = await api.post('/api/user/project', {initial_prompt: input});
-      setLoading(false);
+      const { data } = await api.post('/api/user/project', { initial_prompt: input })
+      
+      if (!data || !data.projectId || typeof data.projectId !== 'string') {
+        console.error('Invalid API response:', data)
+        toast.error('Failed to create project. Please try again.')
+        return
+      }
+      
       navigate(`/projects/${data.projectId}`)
     } catch (error: any) {
-      setLoading(false);
-      toast.error(error?.response?.data?.message || error.message);
-      console.log(error);
+      toast.error(error?.response?.data?.message || error.message)
+      console.log(error)
+    } finally {
+      setLoading(false)
     }
-
   }
 
   return (
-  
-      <section className="relative flex flex-col items-center text-white text-sm pb-28 px-4 font-poppins bg-[#0C0414] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/10 via-transparent to-black/40 pointer-events-none" />
+    <section className='relative min-h-[calc(100vh-76px)] overflow-hidden neo-dot-bg px-4 pb-14 pt-6 md:px-10 lg:px-14'>
+      <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(121,255,147,0.06),transparent_40%),radial-gradient(circle_at_90%_82%,rgba(121,255,147,0.05),transparent_35%)]' />
 
-        <div className="p-px rounded-full bg-gradient-to-r from-indigo-900 to-gray-500 mt-24">
-  <div className="flex items-center justify-center px-4 py-2 rounded-full bg-[#0C0414] text-sm text-slate-200">
-    ⚡ AI-Powered Website Generator
-  </div>
-</div>
+      <div className='relative mx-auto max-w-7xl rounded-[30px] border border-[#1b2a1f] bg-[#060b07]/86 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.5)] backdrop-blur-xl md:p-6'>
+        <div className='grid gap-10 lg:grid-cols-[1.12fr_1fr] lg:items-start'>
+          <div className='px-2 pt-5'>
+            <p className='text-sm font-medium uppercase tracking-[0.14em] text-[#b8ffb5]'>// built for creators and teams</p>
+            <h1 className='mt-5 max-w-xl text-5xl font-semibold leading-[0.95] tracking-tight text-[#d7ffd5] sm:text-6xl md:text-7xl'>
+              AETHER AI
+              <br />
+              Website Studio.
+            </h1>
+            <p className='mt-6 max-w-xl text-lg text-[#9cb39f]'>
+              AETHER AI helps you generate, edit, and publish modern websites from simple prompts with full control over revisions and versions.
+            </p>
 
-       <h1 className="text-4xl md:text-[66px]/[72px] text-center max-w-4xl mt-6 
-bg-gradient-to-r from-[#5b3b82] via-white to-[#5b3b82] 
-text-transparent bg-clip-text font-semibold leading-tight">
-  Design, Build & Launch Websites with AI in Minutes
-</h1>
+            <div className='mt-8 flex flex-wrap gap-3'>
+              <button onClick={() => navigate('/pricing')} className='neo-btn-primary'>See Our Plans</button>
+              <button onClick={() => toast.info('Contact feature coming soon!')} className='neo-btn-outline'>Get in Touch</button>
+            </div>
 
-       <p className="text-sm md:text-base bg-gradient-to-r from-[#5b3b82] via-white to-[#5b3b82] 
-text-transparent bg-clip-text text-center max-w-lg mt-4">
-  Create production-ready websites and UI components instantly with AI-generated layouts, code and design systems.
-</p>
+            <form
+              onSubmit={onSubmitHandler}
+              className='neo-panel mt-7 max-w-2xl p-3'
+            >
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                rows={4}
+                placeholder='Describe your website idea (e.g. conversion-first SaaS landing page with pricing and testimonials)'
+                className='w-full resize-none rounded-xl border border-[#25382a] bg-[#0b130d] p-3 text-sm text-[#ddffdc] outline-none placeholder:text-[#7d927f] focus:border-[#4a7e52]'
+                required
+              />
+              <div className='mt-3 flex items-center justify-between gap-3'>
+                <p className='text-xs text-[#7c8f7f]'>Prompt once, then iterate in the studio.</p>
+                <button
+                  disabled={loading}
+                  className={`neo-btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  {!loading ? 'Create with AI' : (
+                    <>
+                      Creating
+                      <Loader2Icon className='size-4 animate-spin' />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
 
-<div className="absolute top-[220px] left-1/2 -translate-x-1/2 
-w-[800px] h-40 bg-purple-700 blur-[120px] opacity-30 pointer-events-none -z-10"></div>
+            <div className='mt-12'>
+              <p className='text-sm uppercase tracking-[0.12em] text-[#8ba28d]'>Used for:</p>
+              <div className='mt-5 flex flex-wrap items-center gap-8 text-3xl font-semibold tracking-tight text-[#4f6051]'>
+                <span>Landing Pages</span>
+                <span>Portfolios</span>
+                <span>SaaS Sites</span>
+                <span>Storefronts</span>
+              </div>
+            </div>
+          </div>
 
-        <form onSubmit={onSubmitHandler} className="bg-white/10 max-w-2xl w-full rounded-xl p-4 mt-10 border border-indigo-600/70 focus-within:ring-2 ring-indigo-500 transition-all">
-          <textarea onChange={e => setInput(e.target.value)} className="bg-transparent outline-none text-gray-300 resize-none w-full" rows={4} placeholder="“Describe your website idea (e.g. AI fitness app with pricing & blog)”" required />
-          <button 
-            disabled={loading}
-            className={`ml-auto flex items-center gap-2 
-            bg-gradient-to-r from-[#CB52D4] to-indigo-600 
-            rounded-md px-5 py-2.5 transition 
-            ${loading && 'opacity-70 cursor-not-allowed'}`}
-          >
-            {!loading ? 'Create with AI' : (
-              <>
-              Creating <Loader2Icon className='animate-spin size-4 text-white'/>
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="relative mt-16 w-full max-w-5xl px-4">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 
-          w-[700px] h-32 bg-purple-500 blur-[80px] opacity-60"></div>
-
-          <div className="relative z-10 bg-white/5 backdrop-blur rounded-2xl p-3 border border-white/10 shadow-2xl">
-            <img
-              className="rounded-lg"
-              src="https://assets.prebuiltui.com/images/components/hero-section/hero-dashImage1.png"
-              alt="AI Builder Preview"
-            />
+          <div className='pt-3'>
+            <div className='space-y-4'>
+              {featureCards.map((item) => {
+                const Icon = item.icon
+                return (
+                  <div key={item.title} className='neo-list-card flex items-center gap-4 p-4 sm:p-5'>
+                    <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#2d4431] bg-[#111913] text-[#b9ffb6]'>
+                      <Icon className='size-5' />
+                    </div>
+                    <div className='min-w-0 flex-1'>
+                      <h3 className='truncate text-xl font-medium text-[#d8e8d9]'>{item.title}</h3>
+                      <p className='truncate text-base text-[#88a089]'>{item.subtitle}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-16 md:gap-20 mx-auto mt-16">
-          <img className="max-w-28 md:max-w-32" src="https://saasly.prebuiltui.com/assets/companies-logo/framer.svg" alt="" />
-          <img className="max-w-28 md:max-w-32" src="https://saasly.prebuiltui.com/assets/companies-logo/huawei.svg" alt="" />
-          <img className="max-w-28 md:max-w-32" src="https://saasly.prebuiltui.com/assets/companies-logo/instagram.svg" alt="" />
-          <img className="max-w-28 md:max-w-32" src="https://saasly.prebuiltui.com/assets/companies-logo/microsoft.svg" alt="" />
-          <img className="max-w-28 md:max-w-32" src="https://saasly.prebuiltui.com/assets/companies-logo/walmart.svg" alt="" />
-        </div>
-      </section>
-
+      </div>
+    </section>
   )
 }
 

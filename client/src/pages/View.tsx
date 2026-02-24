@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
-import { dummyProjects } from "../assets/assets";
 import { Loader2Icon } from "lucide-react";
 import ProjectPreview from "../components/ProjectPreview";
 import type { Project } from "../types";
@@ -30,13 +29,13 @@ const View = () => {
   if(loading){
     return (
       <div className='flex items-center justify-center h-screen'>
-        <Loader2Icon className='size-7 animate-spin text-indigo-200' />
+        <Loader2Icon className='size-7 animate-spin text-cyan-200' />
       </div>
     )
   }
 
   return (
-    <div className="h-screen">
+    <div className="h-screen p-3">
       {code && <ProjectPreview project={{current_code: code} as Project} isGenerating={false} showEditorPanel={false}/>}
     </div>
   )

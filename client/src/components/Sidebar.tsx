@@ -75,10 +75,10 @@ const Sidebar = ({isMenuOpen, project, setProject, isGenerating, setIsGenerating
     },[project.conversation.length, isGenerating])
 
   return (
-    <div className={`h-full  sm:max-w-sm rounded-xl bg-gray-900 border-gray-800 transition-all ${isMenuOpen ? 'max-sm:w-0 overflow-hidden' : 'w-full'}`}>
+    <div className={`h-full sm:w-[340px] sm:shrink-0 rounded-2xl border border-white/10 bg-[#07152f]/85 backdrop-blur-xl transition-all duration-300 ${isMenuOpen ? 'max-sm:w-0 max-sm:opacity-0 max-sm:overflow-hidden' : 'w-full'}`}>
       <div className='flex flex-col h-full'>
         {/* Messages container */}
-        <div className='flex-1 overflow-y-auto no-scrollbar px-3 flex flex-col gap-4'>
+        <div className='flex-1 overflow-y-auto no-scrollbar px-3 py-3 flex flex-col gap-3'>
             {[...project.conversation, ...project.versions]
             .sort((a,b)=> new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()).map((message)=>{
                 const isMessage = 'content' in message;
@@ -89,15 +89,15 @@ const Sidebar = ({isMenuOpen, project, setProject, isGenerating, setIsGenerating
                     return (
                         <div key={msg.id} className={`flex items-start gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
                             {!isUser && (
-                                <div className='w-8 h-8 rounded-full bg-linear-to-br from-indigo-600 to-indigo-700 flex items-center justify-center'>
+                                <div className='w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-[0_6px_18px_rgba(41,172,255,0.4)]'>
                                     <BotIcon className='size-5 text-white'/>
                                 </div>
                             )}
-                            <div className={`max-w-[80%] p-2 px-4 rounded-2xl shadow-sm text-sm mt-5 leading-relaxed ${isUser ? "bg-linear-to-r from-indigo-500 to-indigo-600 text-white rounded-tr-none" : "rounded-tl-none bg-gray-800 text-gray-100"}`}>
+                            <div className={`max-w-[80%] p-2.5 px-4 rounded-2xl shadow-sm text-sm mt-2 leading-relaxed border ${isUser ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-tr-none border-blue-300/30" : "rounded-tl-none bg-white/8 text-slate-100 border-white/10"}`}>
                                 {msg.content}
                             </div>
                             {isUser && (
-                                <div className='w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center'>
+                                <div className='w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/15'>
                                     <UserIcon className='size-5 text-gray-200'/>
                                 </div>
                             )}
@@ -106,21 +106,21 @@ const Sidebar = ({isMenuOpen, project, setProject, isGenerating, setIsGenerating
                 }else{
                     const ver = message as Version;
                     return (
-                        <div key={ver.id} className='w-4/5 mx-auto my-2 p-3 rounded-xl bg-gray-800 text-gray-100 shadow flex flex-col gap-2'>
-                            <div className='text-xs font-medium'>
+                        <div key={ver.id} className='w-[88%] mx-auto my-1 p-3 rounded-xl bg-white/8 border border-white/10 text-gray-100 shadow flex flex-col gap-2'>
+                            <div className='text-xs font-medium text-slate-200'>
                                 code updated <br /> 
-                                <span className='text-gray-500 text-xs font-normal'>
+                                <span className='text-slate-400 text-xs font-normal'>
                                     {new Date(ver.timestamp).toLocaleString()}
                                 </span>
                             </div>
                             <div className='flex items-center justify-between'>
                                 {project.current_version_index === ver.id ? (
-                                    <button className='px-3 py-1 rounded-md text-xs bg-gray-700'>Current version</button>
+                                    <button className='px-3 py-1 rounded-md text-xs bg-white/12 border border-white/15'>Current version</button>
                                 ): (
-                                    <button onClick={()=> handleRollback(ver.id)} className='px-3 py-1 rounded-md text-xs bg-indigo-500 hover:bg-indigo-600 text-white'>Roll back to this version</button>
+                                    <button onClick={()=> handleRollback(ver.id)} className='px-3 py-1 rounded-md text-xs bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white'>Roll back</button>
                                 )}
-                                <Link target='_blank' to={`/preview/${project.id}/${ver.id}`}>
-                                <EyeIcon className='size-6 p-1 bg-gray-700 hover:bg-indigo-500 transition-colors rounded'/>
+                                <Link target='_blank' to={`/preview/${project.id}/${ver.id}`} aria-label={`Preview version ${ver.id}`} title={`Preview version ${ver.id}`}>
+                                <EyeIcon className='size-7 p-1.5 bg-white/10 border border-white/15 hover:bg-white/18 transition-colors rounded-lg'/>
                                 </Link>
                             </div>
                         </div>
@@ -129,7 +129,7 @@ const Sidebar = ({isMenuOpen, project, setProject, isGenerating, setIsGenerating
             })}
             {isGenerating && (
                 <div className='flex items-start gap-3 justify-start'>
-                    <div className='w-8 h-8 rounded-full bg-linear-to-br from-indigo-600 to-indigo-700 flex items-center justify-center'>
+                    <div className='w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-[0_6px_18px_rgba(41,172,255,0.4)]'>
                         <BotIcon className='size-5 text-white'/>
                     </div>
                     {/* three dot loader */}
@@ -147,8 +147,8 @@ const Sidebar = ({isMenuOpen, project, setProject, isGenerating, setIsGenerating
         {/* Input area */}
         <form onSubmit={handleRevisions} className='m-3 relative'>
             <div className='flex items-center gap-2'>
-                <textarea onChange={(e)=>setInput(e.target.value)} value={input} rows={4} placeholder='Describe your website or request changes...' className='flex-1 p-3 rounded-xl resize-none text-sm outline-none ring ring-gray-700 focus:ring-indigo-500 bg-gray-800 text-gray-100 placeholder-gray-400 transition-all' disabled={isGenerating}/>
-                <button disabled={isGenerating || !input.trim()} className='absolute bottom-2.5 right-2.5 rounded-full bg-linear-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white transition-colors disabled:opacity-60'>
+                <textarea onChange={(e)=>setInput(e.target.value)} value={input} rows={4} placeholder='Describe your website or request changes...' className='flex-1 p-3 rounded-xl resize-none text-sm outline-none border border-white/12 focus:border-blue-400 bg-[#0b1e40] text-gray-100 placeholder-gray-400 transition-all' disabled={isGenerating}/>
+                <button disabled={isGenerating || !input.trim()} className='absolute bottom-2.5 right-2.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-400 hover:to-indigo-400 text-white transition-colors disabled:opacity-60 shadow-[0_8px_18px_rgba(67,116,255,0.4)]'>
                     {isGenerating 
                     ? <Loader2Icon className='size-7 p-1.5 animate-spin text-white'/>
                 : <SendIcon className='size-7 p-1.5 text-white'/>}

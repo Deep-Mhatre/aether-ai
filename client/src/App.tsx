@@ -23,7 +23,7 @@ const App = () => {
                       || pathname.startsWith('/preview/')
 
   return (
-    <div>
+    <div className='min-h-screen app-theme-bg'>
     <Toaster />
       {!hideNavbar && <Navbar />}
       

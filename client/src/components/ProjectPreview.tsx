@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import type { Project } from '../types';
 import { iframeScript } from '../assets/assets';
 import EditorPanel from './EditorPanel';
@@ -21,8 +21,8 @@ const ProjectPreview = forwardRef<ProjectPreviewRef, ProjectPreviewProps>(({proj
     const [selectedElement, setSelectedElement] = useState<any>(null)
 
     const resolutions = {
-        phone: 'w-[412px]',
-        tablet: 'w-[768px]',
+        phone: 'w-[390px]',
+        tablet: 'w-[760px]',
         desktop: 'w-full'
     }
 
@@ -84,27 +84,33 @@ const ProjectPreview = forwardRef<ProjectPreviewRef, ProjectPreviewProps>(({proj
     }
 
   return (
-    <div className='relative h-full bg-gray-900 flex-1 rounded-xl overflow-hidden max-sm:ml-2'>
-      {project.current_code ? (
-        <>
-        <iframe 
-        ref={iframeRef}
-        srcDoc={injectPreview(project.current_code)}
-        className={`h-full max-sm:w-full ${resolutions[device]} mx-auto transition-all`}
-        />
-        {showEditorPanel && selectedElement && (
-            <EditorPanel selectedElement={selectedElement}
-            onUpdate={handleUpdate} onClose={()=>{
-                setSelectedElement(null);
-                if(iframeRef.current?.contentWindow){
-                    iframeRef.current.contentWindow.postMessage({type: 'CLEAR_SELECTION_REQUEST'}, '*')
-                }
-            }}/>
+    <div className='relative h-full flex-1 rounded-2xl border border-white/10 bg-[#091833] overflow-hidden'>
+      <div className='pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-cyan-400/10 to-transparent z-0' />
+      <div className='h-full p-3 sm:p-4 relative z-10'>
+        {project.current_code ? (
+          <>
+          <div className='h-full rounded-xl border border-white/10 bg-[#050d1e] p-2 sm:p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'>
+            <iframe 
+              ref={iframeRef}
+              srcDoc={injectPreview(project.current_code)}
+              sandbox="allow-scripts"
+              className={`h-full max-sm:w-full ${resolutions[device]} mx-auto rounded-lg border border-white/15 bg-white transition-all duration-300 ease-in-out shadow-[0_24px_60px_rgba(0,0,0,0.45)]`}
+            />
+          </div>
+          {showEditorPanel && selectedElement && (
+              <EditorPanel selectedElement={selectedElement}
+              onUpdate={handleUpdate} onClose={()=>{
+                  setSelectedElement(null);
+                  if(iframeRef.current?.contentWindow){
+                      iframeRef.current.contentWindow.postMessage({type: 'CLEAR_SELECTION_REQUEST'}, '*')
+                  }
+              }}/>
+          )}
+          </>
+        ): isGenerating && (
+          <LoaderSteps />
         )}
-        </>
-      ): isGenerating && (
-        <LoaderSteps />
-      )}
+      </div>
     </div>
   )
 })
