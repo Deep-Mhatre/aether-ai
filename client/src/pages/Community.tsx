@@ -5,20 +5,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import api from '@/configs/axios';
 import { toast } from 'sonner';
+import { dummyProjects } from '@/assets/assets';
 
 const Community = () => {
     const [loading, setLoading] = useState(true);
     const [projects, setProjects] = useState<Project[]>([])
     const navigate = useNavigate()
+    const communityFallbackProjects: Project[] = dummyProjects
+      .filter((project) => project.isPublished)
+      .map((project) => ({
+        ...project,
+        // Keep community fallback lightweight; large HTML blobs in iframes can stall rendering.
+        current_code: '',
+      }));
 
     const fetchProjects = async () => {
        try {
         const { data } = await api.get('/api/project/published');
-        setProjects(data.projects);
-        setLoading(false);
+        const publishedProjects: Project[] = data?.projects ?? [];
+        setProjects(publishedProjects.length > 0 ? publishedProjects : communityFallbackProjects);
        } catch (error: any) {
         console.log(error);
         toast.error(error?.response?.data?.message || error.message);
+        setProjects(communityFallbackProjects);
+       } finally {
+        setLoading(false);
        }
     }
 
